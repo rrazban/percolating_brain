@@ -1,0 +1,3 @@
+all atlases have been renumbered such that all the white matter are merged into one label
+Harvard-Oxford, Desikan-Killiany (hardi) = 1
+Talairach = 14

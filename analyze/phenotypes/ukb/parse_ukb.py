@@ -11,7 +11,7 @@ import pandas as pd
 
 
 def parse_raw_phenotype_file():
-    pheno_file = 'ukb25909.csv'
+    pheno_file = 'too_big_ukb25909.csv'
 
     eids = []
     ages = []
