@@ -62,8 +62,7 @@ def get_dMRI(dataset):
     done_already = [fname.split('/')[-1].replace('_conn.txt', '') for fname in done_already]
 
     if dataset=='ukb':
-       # fnames = glob('/shared/datasets/public/ukb/dti_warped/*')#[:10] #dMRI data files 
-        fnames = ['/shared/datasets/public/ukb/dti_warped/6025360_20250_2_0.nii.gz']
+        fnames = glob('/shared/datasets/public/ukb/dti_warped/*')#[:10] #dMRI data files 
         remaining = [fname for fname in fnames if fname.split('/')[-1].replace('.nii.gz', '') not in done_already]
     elif dataset=='abcd':
         fnames = glob('/shared/datasets/public/abcd/AWS_downloads/fmriresults01/*.tgz')
@@ -93,7 +92,7 @@ def restructure(tract_structure, data):
     fresh_structure += fresh_structure.T 
     return fresh_structure
 
-def readin_ukb(fname):  #remove hardi label from everything
+def readin_ukb(fname):
   subj = fname.split('/')[-1].replace('.nii.gz', '.zip')
   
   compressed = '/shared/datasets/public/ukb/dti_raw/%s' % subj
@@ -109,7 +108,7 @@ def readin_ukb(fname):  #remove hardi label from everything
 
   return fname, bval_fname, bvec_fname, uncompressed, subj
 
-def readin_abcd(fnamegz):    #typo, had it as label_img not labelS_img
+def readin_abcd(fnamegz):
   uncompressed = '/scratch/rostam/'
   tar = tarfile.open(fnamegz, "r:gz")
   tar.extractall(path=uncompressed)
@@ -140,9 +139,9 @@ def compute_features(fname, labels, labels_img, white_matter_label, dataset):
   elif dataset=='abcd':
     fname, bval_fname, bvec_fname, scratch_file, subj = readin_abcd(fname)
 
-  hardi_img = image.load_img(fname) # warped
-  hardi_img = image.resample_to_img(hardi_img, labels_img)
-  data, affine = hardi_img.get_fdata(), hardi_img.affine
+  img = image.load_img(fname) # warped
+  img = image.resample_to_img(img, labels_img)
+  data, affine = img.get_fdata(), img.affine
 
   bvals, bvecs = read_bvals_bvecs(bval_fname, bvec_fname)
   shutil.rmtree(scratch_file)

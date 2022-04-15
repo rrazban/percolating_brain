@@ -1,4 +1,0 @@
-Number of jobs: 770
-Start time: 2022-04-13 09:12:58.180404
-atlas/Talairach.nii.gz
-white matter label: 14
