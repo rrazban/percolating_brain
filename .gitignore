@@ -1,0 +1,4 @@
+*.pyc*
+*extra*
+__pycache__/
+*too_big**
