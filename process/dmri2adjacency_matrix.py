@@ -58,8 +58,8 @@ def get_remaining_abcd(fnames, pre_done_already):
 
 
 def get_dMRI(dataset):
-    done_already = glob('/shared/datasets/public/{0}/derivatives/*_conn.txt'.format(dataset))   #output data files
-    done_already = [fname.split('/')[-1].replace('_conn.txt', '') for fname in done_already]
+    done_already = glob('/shared/datasets/public/{0}/derivatives/*_density.txt'.format(dataset))   #output data files
+    done_already = [fname.split('/')[-1].replace('_density.txt', '') for fname in done_already]
 
     if dataset=='ukb':
         fnames = glob('/shared/datasets/public/ukb/dti_warped/*')#[:10] #dMRI data files 
@@ -181,14 +181,14 @@ def compute_features(fname, labels, labels_img, white_matter_label, dataset):
      M[:, r] = 0
 
   out_dir = '/shared/datasets/public/{0}/derivatives'.format(dataset) 
-  np.savetxt('{0}/{1}'.format(out_dir, subj.replace('.zip', '_conn.txt')), M)
+  np.savetxt('{0}/{1}'.format(out_dir, subj.replace('.zip', '_density.txt')), M)
   M_lengths = restructure(M, grouping)
-  np.savetxt('{0}/{1}'.format(out_dir, subj.replace('.zip', '_dist.txt')), M_lengths)   #change this to _length, dist is not right. #maybe change _conn to _density?
+  np.savetxt('{0}/{1}'.format(out_dir, subj.replace('.zip', '_length.txt')), M_lengths)
 
-  out_fname = '{0}/{1}'.format(out_dir, subj.replace('.zip', '_grp.pkl'))  #gives all the tracts, just in case i want to do something else besides density or length #large memory
-  fhandler = open(out_fname, 'wb')      
-  pickle.dump(grouping, fhandler)   #hard to load this in parallel during analysis, hence i make the dist file right now
-  fhandler.close()
+#  out_fname = '{0}/{1}'.format(out_dir, subj.replace('.zip', '_grp.pkl'))  #gives all the tracts, just in case i want to do something else besides density or length #large memory
+#  fhandler = open(out_fname, 'wb')      
+#  pickle.dump(grouping, fhandler)   #hard to load this in parallel during analysis, hence i make the length file right now
+#  fhandler.close()
 
 
 

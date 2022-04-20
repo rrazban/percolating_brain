@@ -94,8 +94,8 @@ if __name__ == '__main__':
     dataset = 'abcd'    #abcd or ukb
 
     collect = []
-    for which in ['conn', 'dist']:  #change naming convention
-        filenames = sorted(glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, which))[:10])
+    for which in ['density', 'length']: 
+        filenames = sorted(glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, which)))
 
         print("working on {0} dataset's {1}.txt files, N={2}".format(dataset, which, len(filenames)))
 
