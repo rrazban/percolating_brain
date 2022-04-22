@@ -36,7 +36,8 @@ def plotout(x, y, xlabel, ylabel, exp_label):
     plt.violinplot(P_pref, positions = k_pref, showmeans=True, showmedians=True, showextrema=False)
 
     labels = add_label()
-    plt.legend(*zip(*labels), loc= (0.61, 0.55), prop={'size':12})
+   # plt.legend(*zip(*labels), loc= (0.61, 0.55), prop={'size':12})
+    plt.legend(*zip(*labels), loc= (0.61, 0.52), prop={'size':12})
 
     plt.xlabel(xlabel, fontsize = 14)   #default size is 10
     plt.ylabel(ylabel, fontsize=14)
@@ -45,8 +46,8 @@ def plotout(x, y, xlabel, ylabel, exp_label):
     plt.xlim([-1, max(x)+1])
     plt.ylim([-0.05, 1.05])
 
-#    plt.title('Increasing Tract ' + r"$\bf{" + exp_label.capitalize() + "}$" + " Targeted Attack", fontsize=16)#.format(which))  #default size is 12
-    plt.title('Increasing Tract ' + r"$\bf{" + exp_label.capitalize() + "}$" + " Targeted Attack (H-O atlas)", fontsize=14)#.format(which))  #default size is 12
+    plt.title('Increasing Tract ' + r"$\bf{" + exp_label.capitalize() + "}$" + " Targeted Attack", fontsize=16)#.format(which))  #default size is 12
+#    plt.title('Increasing Tract ' + r"$\bf{" + exp_label.capitalize() + "}$" + " Targeted Attack (H-O atlas)", fontsize=14)#.format(which))  #default size is 12
 
 
     #have inset to focus on early <k>
@@ -107,7 +108,7 @@ if __name__ == '__main__':
     which = 'density'    #tract length or tract density
     dataset = 'ukb'    #abcd or ukb
 
-    filenames = ['../../sample_outputs/atlas/HarOx_6025360_20250_2_0_{0}.txt'.format(which)]
+    filenames = ['../../sample_outputs/standard/6025360_20250_2_0_{0}.txt'.format(which)]
 
     for f,filename in enumerate(filenames):
         print(filename)

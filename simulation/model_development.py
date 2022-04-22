@@ -164,17 +164,17 @@ def make_graph():
                     available_orbits = get_available_orbits(d_orbits, total_orbits, M_orbit)
 
 #                   M_density = grow_edge(M_density, 1)
-                    M_density = grow_edge(M_density, random.uniform(0,5)) #introduce some randomness so that do not have a lot of edges with the exact same density #becomes explosive percolation if no randomness
+                    M_density = grow_edge(M_density, random.uniform(1,10)) #introduce some randomness so that do not have a lot of edges with the exact same density #becomes explosive percolation if no randomness
 
                 M_orbit[ind2] = random.choice(available_orbits)
 				
-#           M_density = initialize_edge(M_density, ind1, ind2, 1)
-            M_density = initialize_edge(M_density, ind1, ind2, random.uniform(0,5))
+#            M_density = initialize_edge(M_density, ind1, ind2, 1)
+            M_density = initialize_edge(M_density, ind1, ind2, random.uniform(1,10))
 
 
     M_distance = get_distances(M_density, M_orbit,dr) #implicitly assume length and distance are interchangeable
 
-    distance_v_density(M_density, M_distance) #length vs density correlation
+    distance_v_density(M_density, M_distance) #distance vs density correlation
     sys.exit()
 
     M_adjacency_dist = preprocess(M_distance)
@@ -189,7 +189,7 @@ def make_graph():
 
 
 if __name__ == '__main__':
-    repeat = 10#1000
+    repeat = 10#00
 
     collection = np.arange(0, 14, 0.5)
     output = [[] for _ in collection]
@@ -207,6 +207,6 @@ if __name__ == '__main__':
             output1[i].append(result1[indi1])
 
     pred_output = theory_no_alpha(collection)
+    plotout(collection, output1, pred_output, '', 'density')
     plotout(collection, output, pred_output, '', 'distance')
 
-    plotout(collection, output1, pred_output, '', 'density')

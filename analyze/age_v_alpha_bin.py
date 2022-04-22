@@ -14,15 +14,22 @@ import matplotlib.pyplot as plt
 from scipy.stats import spearmanr, binned_statistic
 
 
-def plotout(xs, ys, which):
+def plotout(xs, ys, which, dataset):
     rho, pval = spearmanr(xs, ys)
 
     means, bins, binnums = binned_statistic(xs, ys, statistic='mean', bins=5)
     std, bins, binnums = binned_statistic(xs, ys, statistic='std', bins=5)
     bins = np.diff(bins)/2.+bins[:-1]
-    plt.errorbar(bins, means, yerr = std, label='$\\rho=$ {0:.2f} ({1:.2E})\n$N=$ {2}'.format(rho, pval, len(xs)))
+    plt.errorbar(bins, means, yerr = std, fmt='o-',markersize=8, capsize=6, color='r', label='$\\rho=$ {0:.2f} ({1:.2E})\n$N=$ {2}'.format(rho, pval, len(xs)))
 
-    plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack (UK Biobank)", fontsize=14)#.format(which))  #default size is 12
+
+    if dataset=='ukb':
+        dataset_title = 'UK Biobank'
+    elif dataset=='abcd':
+        dataset_title = 'ABCD Study'
+
+
+    plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack ({0})".format(dataset_title), fontsize=14)  #default size is 12
     plt.ylabel('modularity $\\alpha$', fontsize=14)
     plt.xlabel('age', fontsize=14)
     plt.xticks(fontsize=14)
@@ -36,14 +43,14 @@ def plotout(xs, ys, which):
 
 if __name__ == '__main__':
     dataset = 'ukb' #ukb or abcd
-    which = 'density'    #length or density
+    which = 'length'    #length or density
 
     alpha_file = './{0}.csv'.format(dataset)
     alpha_output = pd.read_csv(alpha_file)
     if which=='density':
-        d_alpha = dict(zip(alpha_output.id, alpha_output.alpha_density))   #toggle distance/density here
+        d_alpha = dict(zip(alpha_output.id, alpha_output.alpha_density))
     elif which=='length':
-        d_alpha = dict(zip(alpha_output.id, alpha_output.alpha_length))   #toggle distance/density here
+        d_alpha = dict(zip(alpha_output.id, alpha_output.alpha_length)) 
 
     phenotypes = pd.read_csv('./phenotypes/{0}/phenotypes.csv'.format(dataset))
 
@@ -61,5 +68,4 @@ if __name__ == '__main__':
         alphas.append(d_alpha[eid])
         d_alpha.pop(eid, None)  #seems like we got reps in phenotypes.csv for ABCD
 
-    plotout(ages, alphas, which)
-
+    plotout(ages, alphas, which, dataset)
