@@ -27,11 +27,18 @@ def plotout(xs, ys, which, dataset):
         dataset_title = 'UK Biobank'
     elif dataset=='abcd':
         dataset_title = 'ABCD Study'
+    elif dataset=='dhcp':
+        dataset_title = 'dHCP'
 
 
     plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack ({0})".format(dataset_title), fontsize=14)  #default size is 12
     plt.ylabel('modularity $\\alpha$', fontsize=14)
-    plt.xlabel('age', fontsize=14)
+
+    if dataset=='dhcp':
+        plt.xlabel('gestational age in weeks', fontsize=14)
+    else:
+        plt.xlabel('age in years', fontsize=14)
+
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     plt.legend(prop={'size':12})
@@ -42,7 +49,7 @@ def plotout(xs, ys, which, dataset):
 
 
 if __name__ == '__main__':
-    dataset = 'ukb' #ukb or abcd
+    dataset = 'ukb' #ukb, abcd, dhcp
     which = 'length'    #length or density
 
     alpha_file = './{0}.csv'.format(dataset)

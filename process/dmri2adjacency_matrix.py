@@ -1,6 +1,6 @@
 """
-Process the diffusion MRI data from the UK Biobank
-or ABCD study into a weighted adjacency matrix
+Process the diffusion MRI data from the UK Biobank, 
+ABCD study, or dHCP into a weighted adjacency matrix
 where elements represent tract length or density.
 
 Closely follows the DIPY tutorial for generating 
@@ -11,7 +11,7 @@ https://dipy.org/documentation/1.3.0./examples_built/streamlines_analysis/stream
 
 
 import numpy as np
-from scipy.ndimage.morphology import binary_dilation
+from scipy.ndimage import binary_dilation
 
 from dipy.core.gradients import gradient_table
 from dipy.data import get_fnames
@@ -57,16 +57,21 @@ def get_remaining_abcd(fnames, pre_done_already):
     return not_present
 
 
+
+
 def get_dMRI(dataset):
     done_already = glob('/shared/datasets/public/{0}/derivatives/*_density.txt'.format(dataset))   #output data files
     done_already = [fname.split('/')[-1].replace('_density.txt', '') for fname in done_already]
 
     if dataset=='ukb':
-        fnames = glob('/shared/datasets/public/ukb/dti_warped/*')#[:10] #dMRI data files 
+        fnames = glob('/shared/datasets/public/ukb/dti_warped/*')   #dMRI data files 
         remaining = [fname for fname in fnames if fname.split('/')[-1].replace('.nii.gz', '') not in done_already]
     elif dataset=='abcd':
         fnames = glob('/shared/datasets/public/abcd/AWS_downloads/fmriresults01/*.tgz')
         remaining = get_remaining_abcd(fnames, done_already)
+    elif dataset=='dhcp':
+        fnames = glob('/shared/datasets/public/dhcp/rel3_dhcp_dmri_shard_pipeline/*/*/dwi/*dwi.nii.gz') 
+        remaining = [fname for fname in fnames if fname.split('/')[-1].replace('.nii.gz', '') not in done_already]
 
     return remaining
 
@@ -94,7 +99,6 @@ def restructure(tract_structure, data):
 
 def readin_ukb(fname):
   subj = fname.split('/')[-1].replace('.nii.gz', '.zip')
-  
   compressed = '/shared/datasets/public/ukb/dti_raw/%s' % subj
   uncompressed = '/scratch/rostam/%s' % subj
 
@@ -131,20 +135,38 @@ def readin_abcd(fnamegz):
 
   return fname, bval_fname, bvec_fname, scratch_file, subj
 
+def readin_dhcp(fname):
+  subj = fname.split('/')[-1].replace('.nii.gz', '.zip')
+  
+  bval_fname = fname.replace('.nii.gz', '.bval')
+  bvec_fname = fname.replace('.nii.gz', '.bvec')
+  scratch_file = 'none'
+
+  return fname, bval_fname, bvec_fname, scratch_file, subj
+
+
+
 
 
 def compute_features(fname, labels, labels_img, white_matter_label, dataset):
-  if dataset=='ukb':    #breaks after a while, i think it has to do with nested function and multiprocess not liking that
+  if dataset=='ukb': 
     fname, bval_fname, bvec_fname, scratch_file, subj = readin_ukb(fname)
   elif dataset=='abcd':
     fname, bval_fname, bvec_fname, scratch_file, subj = readin_abcd(fname)
+  elif dataset=='dhcp':
+    fname, bval_fname, bvec_fname, scratch_file, subj = readin_dhcp(fname)
+
 
   img = image.load_img(fname) # warped
   img = image.resample_to_img(img, labels_img)
   data, affine = img.get_fdata(), img.affine
 
   bvals, bvecs = read_bvals_bvecs(bval_fname, bvec_fname)
-  shutil.rmtree(scratch_file)
+
+  if dataset=='dhcp':   #nothing needs to be removed for dhcp since no tar files
+      pass
+  else:
+      shutil.rmtree(scratch_file)  
 
   gtab = gradient_table(bvals, bvecs)
   white_matter = binary_dilation((labels == white_matter_label))
@@ -184,7 +206,7 @@ def compute_features(fname, labels, labels_img, white_matter_label, dataset):
   np.savetxt('{0}/{1}'.format(out_dir, subj.replace('.zip', '_density.txt')), M)
   M_lengths = restructure(M, grouping)
   np.savetxt('{0}/{1}'.format(out_dir, subj.replace('.zip', '_length.txt')), M_lengths)
-
+  print('{0} is complete'.format(subj), flush=True)
 #  out_fname = '{0}/{1}'.format(out_dir, subj.replace('.zip', '_grp.pkl'))  #gives all the tracts, just in case i want to do something else besides density or length #large memory
 #  fhandler = open(out_fname, 'wb')      
 #  pickle.dump(grouping, fhandler)   #hard to load this in parallel during analysis, hence i make the length file right now
@@ -193,18 +215,21 @@ def compute_features(fname, labels, labels_img, white_matter_label, dataset):
 
 
 if __name__ == '__main__':
-    dataset = 'ukb' #ukb or abcd
+    dataset = 'ukb' #ukb, abcd, dhcp
 
     dMRIs = get_dMRI(dataset)
-    print("Number of jobs: {0}".format(len(dMRIs)))
+    print("Number of jobs: {0}".format(len(dMRIs)), flush=True) 
     start_time = datetime.datetime.now()
-    print("Start time: {0}".format(start_time))
-
+    print("Start time: {0}".format(start_time), flush=True)
     labels, labels_img, white_matter_label = get_atlas_info()
 
-    with Pool(3) as p:      #optimized for 32 proc #note that dipy already recruites more than 1 proc per job
-        prod_x = partial(compute_features, labels=labels, labels_img=labels_img, white_matter_label=white_matter_label, dataset=dataset)
-        p.map(prod_x, dMRIs)
+    for dMRI in dMRIs:
+        compute_features(dMRI, labels, labels_img, white_matter_label, dataset) 
+
+
+#    with Pool(2) as p:      #optimized for 32 proc #note that dipy already recruites more than 1 proc per job  #does not work well for dHCP, need to run only 1 at a time per cluster
+ #       prod_x = partial(compute_features, labels=labels, labels_img=labels_img, white_matter_label=white_matter_label, dataset=dataset)
+  #      p.map(prod_x, dMRIs)
 
     end_time = datetime.datetime.now()
     print("End time: {0}".format(end_time))

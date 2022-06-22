@@ -2,7 +2,7 @@
 Fit alpha values to experimental P curves for
 each individual. Write out alpha vales to a 
 text file named by the respective database,
-UK Biobank or ABCD Study.
+UK Biobank, ABCD Study or dHCP.
 
 """
 
@@ -19,12 +19,8 @@ from scipy.stats import spearmanr
 from datetime import datetime 
 
 
-def get_ages_abcd(filenames):
-    d_age = parse_phenotype('abcd')
-
-    ages = []
+def get_ids_abcd(filenames):
     eids = []
-    not_present = []
 
     for filename in filenames:
         pre_eid = filename.split('/')[-1]
@@ -32,41 +28,29 @@ def get_ages_abcd(filenames):
         new_eid = pre_eid[pre_eid.index('_')+1:]
         second = new_eid[new_eid.index('-')+1:new_eid.index('_')]
         fname='{0}_{1}'.format(first, second)
-        if fname in d_age:
-            age = d_age[fname]
-            ages.append(age)
-            eids.append(fname)
-        else:
-            print("{0} not present in fmriresults01.txt".format(fname))
-            not_present.append(filename)
-    return eids, ages, not_present
+        eids.append(fname)
+    return eids
 
 
-def parse_phenotype(dataset):
-    pheno_file = './phenotypes/{0}/phenotypes.csv'.format(dataset) 
-    phenotypes = pd.read_csv(pheno_file)
-	
-    d_age = dict(zip(phenotypes.id, phenotypes.age))
-    return d_age
-
-def get_ages_ukb(filenames):
-    d_age = parse_phenotype('ukb')
-
-    ages = []
-    not_present = []
+def get_ids_ukb(filenames):
     eids = []
 
     for filename in filenames:
         pre_eid = filename.split('/')[-1]
         eid = int(pre_eid[:pre_eid.index('_')])
-        if eid in d_age:
-            age = d_age[eid]
-            ages.append(age)
-            eids.append(eid)
-        else:
-            print("{0} not present in phenotypes.csv".format(eid))
-            not_present.append(filename)
-    return eids, ages, not_present
+        eids.append(eid)
+    return eids
+
+def get_ids_dhcp(filenames):
+    eids = []
+
+    for filename in filenames:
+        pre_eid = filename.split('/')[-1]
+        eid = pre_eid[pre_eid.index('-')+1:pre_eid.index('_')]
+
+        full_id='{0}_{1}'.format(first, second)
+        eids.append(eid)
+    return eids
 
 
 def run(filename):
@@ -80,10 +64,10 @@ def run(filename):
     return popt[0]
 
     #check goodness of fit
- #   pred_P_ones = theory(avg_degrees, popt[0])
-#    r, pval = (spearmanr(pred_P_ones[:zero_i], P_ones[:zero_i]))
+#    pred_P_ones = theory(avg_degrees, popt[0])
+ #   r, pval = (spearmanr(pred_P_ones[:zero_i], P_ones[:zero_i]))
 #    return -np.log10(pval) 
-
+#    return pcov[0][0]**0.5  #transform variance to std #better than r and pval cuz essentially 1 and 0
 
 
 
@@ -91,21 +75,20 @@ if __name__ == '__main__':
     start_time = datetime.now()    
     print("Start time: {0}".format(start_time))
 
-    dataset = 'abcd'    #abcd or ukb
+    dataset = 'dhcp'    #abcd, ukb, dhcp
 
     collect = []
     for which in ['density', 'length']: 
-        filenames = sorted(glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, which)))
+        filenames = sorted(glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, which)))#[:2]
 
         print("working on {0} dataset's {1}.txt files, N={2}".format(dataset, which, len(filenames)))
 
         if dataset == 'ukb':
-            eids, ages, not_present = get_ages_ukb(filenames)
+            eids = get_ids_ukb(filenames)
         elif dataset == 'abcd':
-            eids, ages, not_present = get_ages_abcd(filenames)
-
-        for fname in not_present:
-            filenames.remove(fname)
+            eids = get_ids_abcd(filenames)
+        elif dataset == 'dhcp':
+            eids = get_ids_abcd(filenames)
 
         with Pool(28) as p: #28 is the number of processors 
             alphas = p.map(run, filenames)

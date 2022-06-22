@@ -17,10 +17,10 @@ from scipy.optimize import curve_fit
 
 
 
-def beautify_figure(avg_degrees, P_ones, alpha, exp_label):
+def beautify_figure(ax, avg_degrees, P_ones, alpha, exp_label):
     plt.title('Increasing Tract ' + r"$\bf{" + exp_label.capitalize() + "}$" + " Targeted Attack", fontsize=16)  #default size is 12
     plt.xlabel('average degree $\langle k \\rangle$', fontsize = 14)   #default size is 10
-    plt.ylabel('probability in the giant cluster $P$', fontsize=14)
+    plt.ylabel('probability in the giant cluster $P_g$', fontsize=14)
     plt.legend(loc = (0.63, 0.58), prop={'size': 12})    #default is 10
 
     plt.xticks(fontsize=14)
@@ -134,6 +134,7 @@ def random_graph(ks):
     return p_solns
 
 def theory(ks, alpha):
+
     p_solns = (1 + lambertw(-( 1) * np.exp(-(ks/alpha + 1)))).real
    # p_solns = 1 + lambertw(-(ks**2/2 + ks + 1) * np.exp(-(ks + 1))).real    #correct for coarser parcellation (smaller N)
     p_solns[-1] = 0  #lambertw is undefinedi at <k>=0
@@ -142,11 +143,11 @@ def theory(ks, alpha):
 
 
 if __name__ == '__main__':
-    which = 'distance'    #tract length or tract density
-    dataset = 'ukb'    #abcd or ukb
+    which = 'density'    #tract length or tract density
+    dataset = 'dhcp'    #abcd, ukb, dhcp
 
-    filenames = ['../sample_outputs/standard/6025360_20250_2_0_{0}.txt'.format(which)]
-#   filenames = glob.glob('/shared/datasets/public/{0}/derivatives/*_conn.txt'.format(dataset))[:1] #fix conn name convention
+    filenames = ['../sample_outputs/standard/6025360_20250_2_0_{0}.txt'.format(which)] #these are all ukb dataset
+#    filenames = glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, which))[:1]
 
     for f,filename in enumerate(filenames):
         print(filename)
@@ -160,4 +161,4 @@ if __name__ == '__main__':
         plt.plot(avg_degrees, theory(avg_degrees, popt[0]), label = 'theory, $\\alpha$={:.1f}'.format(popt[0]))
         plt.plot(avg_degrees, random_graph(np.array(avg_degrees)), label = 'random graph')
         plt.scatter(avg_degrees, P_ones, color='r', label='human subject')
-        beautify_figure(avg_degrees, P_ones, popt[0], which)
+        beautify_figure(ax, avg_degrees, P_ones, popt[0], which)
