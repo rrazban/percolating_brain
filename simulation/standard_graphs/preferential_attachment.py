@@ -18,7 +18,7 @@ sys.path.append('../../analyze')
 from Pcurve import get_k_and_P
 
 
-n = 100 
+n = 727 
 
 
 def setup_edges(n):
@@ -87,7 +87,7 @@ def make_graph():
 
 
 if __name__ == '__main__':
-    repeat = 10#0#0
+    repeat = 10#00
 
     collection = np.arange(0, 14, 0.5)
     output = [[] for _ in collection]
