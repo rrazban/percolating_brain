@@ -1,7 +1,10 @@
 """
 Compare alpha distribution of individuals with 
-some disease compared to healthy individuals.
-
+some categorical value compared to another 
+categorical value for UK Biobank. Categories include:
+    female vs male
+    diabetes vs healthy
+    bipoloar/depression vs healthy
 """
 
 
@@ -14,35 +17,43 @@ from scipy.stats import ks_2samp
 
 
 
-def group_by_disease(phenotypes, disease):
+def group_by_category(phenotypes, cat):
 #diabetes code: https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=100291
 #bipolar/dep code: https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=100695
 
-    ingroup = []
-    outgroup = []
-    for eid, status in zip(phenotypes['id'], phenotypes[disease]):
+    group1 = []
+    group2 = []
+    for eid, status in zip(phenotypes['id'], phenotypes[cat]):
         if eid not in d_alpha:  #technically do not need cuz do this when make phenotype file
             continue
 
         if status>0:    #for diabetes: -1 = do not know, -3 = prefer not to answer  #no one in dataset has been diagnosed with diabetes at birth (status=0)
                         #for bipolar/depression: 0 = none
-            ingroup.append(d_alpha[eid])
+                        #for sex: 0=female, 1=male
+            group1.append(d_alpha[eid])
         else:   #assume empty, as well as -1 and -3 correspond to no disorder
-            outgroup.append(d_alpha[eid])
+            group2.append(d_alpha[eid])
 
-    return ingroup, outgroup
+    return group1, group2
 
 
-def plotout(ingroup, outgroup, disease, which):
-    plt.hist(ingroup, density = True, alpha = 0.3, label='{0} ($N$={1})'.format(disease, len(ingroup)))
-    plt.hist(outgroup, density = True, alpha = 0.3, label='healthy ($N$={0})'.format(len(outgroup)))
+def plotout(group1, group2, cat, which):
+    if cat=='bipolar/depression':
+        plt.hist(group1, density = True, alpha = 0.3, label='bipolar or depression ($N$={0})'.format(len(group1)))
+        plt.hist(group2, density = True, alpha = 0.3, label='healthy ($N$={0})'.format(len(group2)))
+    elif cat=='sex':
+        plt.hist(group1, density = True, alpha = 0.3, label='male ($N$={0})'.format(len(group1)))
+        plt.hist(group2, density = True, alpha = 0.3, label='female ($N$={0})'.format(len(group2)))
+    else:
+        plt.hist(group1, density = True, alpha = 0.3, label='{0} ($N$={1})'.format(cat, len(group1)))
+        plt.hist(group2, density = True, alpha = 0.3, label='healthy ($N$={0})'.format(len(group2)))
 
     plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack (UK Biobank)", fontsize=14)#.format(which))  #default size is 12
-    plt.xlabel('modularity $\\alpha$', fontsize=14)
+    plt.xlabel('growth parameter $\\alpha$', fontsize=14)
     plt.ylabel('frequency', fontsize=14)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
-    ks, pval = (ks_2samp(ingroup, outgroup))
+    ks, pval = (ks_2samp(group1, group2))
     leg = plt.legend(title='K-S = {0:.2f} ({1:.2E})'.format(ks, pval), prop={'size':12})
     leg.set_title(title = 'K-S = {0:.2f} ({1:.2E})'.format(ks, pval), prop={'size':12})
     plt.tight_layout()
@@ -50,8 +61,8 @@ def plotout(ingroup, outgroup, disease, which):
 
 
 if __name__ == '__main__':
-    which = 'density'
-    disease = 'diabetes' #bipolar/depression or diabetes
+    which = 'length'
+    category = 'sex' #bipolar/depression, diabetes or sex 
 
     alpha_file = 'ukb.csv' #this analysis is only for ukb
     alphas = pd.read_csv(alpha_file)
@@ -63,5 +74,5 @@ if __name__ == '__main__':
 
 
     phenotypes = pd.read_csv('./phenotypes/ukb/phenotypes.csv')
-    ingroup, outgroup = group_by_disease(phenotypes, disease)
-    plotout(ingroup, outgroup, disease, which)
+    group1, group2 = group_by_category(phenotypes, category)
+    plotout(group1, group2, category, which)

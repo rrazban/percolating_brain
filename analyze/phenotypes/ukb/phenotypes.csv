@@ -1,4 +1,4 @@
-id,age,diabetes,bipolar/depression,gender
+id,age,diabetes,bipolar/depression,sex
 1000032,63,,0,1
 1000083,65,,0,0
 1000366,74,,,1
