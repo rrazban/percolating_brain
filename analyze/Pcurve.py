@@ -19,9 +19,12 @@ from scipy.optimize import curve_fit
 
 def beautify_figure(ax, avg_degrees, P_ones, alpha, exp_label):
     plt.title('Increasing Tract ' + r"$\bf{" + exp_label.capitalize() + "}$" + " Targeted Attack", fontsize=16)  #default size is 12
+#    plt.title('$\it{Decreasing}$ Tract ' + r"$\bf{" + exp_label.capitalize() + "}$" + " Targeted Attack", fontsize=16)  #default size is 12
     plt.xlabel('average degree $\langle k \\rangle$', fontsize = 14)   #default size is 10
-    plt.ylabel('probability in the giant cluster $P_g$', fontsize=14)
-    plt.legend(loc = (0.63, 0.58), prop={'size': 12})    #default is 10
+    plt.ylabel('probability in the giant cluster $P$', fontsize=14)
+#    plt.legend(loc = (0.63, 0.58), prop={'size': 12})    #default is 10
+    plt.legend(loc = (0.57, 0.58), prop={'size': 12})   #for mice and dti
+#    plt.legend(loc = (0.52, 0.58), prop={'size': 12})   #for csa 
 
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
@@ -32,6 +35,7 @@ def beautify_figure(ax, avg_degrees, P_ones, alpha, exp_label):
     axins = ax.inset_axes([0.5, 0.03, 0.47, 0.47])
 
     axins.scatter(avg_degrees, P_ones, color='r')
+#    axins.scatter(ori_avg_degrees, ori_P_ones, color='r')
     axins.plot(avg_degrees, theory(avg_degrees, alpha))
     axins.plot(avg_degrees, random_graph(np.array(avg_degrees)))
 
@@ -81,7 +85,9 @@ def break_apart(structure, thresholds):
     P_ones = []
 
     for lim in thresholds:#reversed(thresholds):       
+#    for lim in reversed(thresholds):       
         structure[structure<lim] = 0	#switch < to > for reversed
+       # structure[structure>lim] = 0	#switch < to > for reversed
 
         G = nx.from_numpy_matrix(structure)
         avg_degree, P_one = get_k_and_P(G)
@@ -90,17 +96,18 @@ def break_apart(structure, thresholds):
         P_ones.append(P_one)
 
         if lim==thresholds[0] and print_extra_info:
+            print('number of nodes: {0:.2f}'.format(len([deg for (node, deg) in G.degree()])))
             print('average degree: {0:.2f}'.format(np.mean([deg for (node, deg) in G.degree()])))
             print('average clustering coefficient: {0:.2f}'.format(nx.average_clustering(G)))
             print('average shortest path length: {0}'.format(nx.average_shortest_path_length(G)))
 
-        #   plt.hist(structure[np.nonzero(structure)])  #check out degree distribution
-         #  plt.show()
+#            plt.hist(structure[np.nonzero(structure)])  #check out degree distribution
+ #           plt.show()
      
     return np.array(avg_degrees), np.array(P_ones)
 
 def preprocess(r):
-    print_extra_info = False
+    print_extra_info = False 
 
     np.fill_diagonal(r, 0)	#if dont remove diagonals, shifts avg degree to the right!
 
@@ -118,7 +125,7 @@ def preprocess(r):
 
 def get_experimental_data(filename):
     thresholds = np.logspace(-1, 4.2, num=200)
- #   thresholds = np.logspace(-.7, 1.5, num=50)  #for mice densities    #np.logspace(3.8, 4.2, num=50)  #for mice distances (units are um)
+#    thresholds = np.logspace(-.7, 1.5, num=50)  #for mice densities    #    thresholds = np.logspace(3.8, 4.2, num=50)  #for mice distances (units are um)
 
     adjacency_matrix = pd.read_csv(filename, delimiter=" ", header=None).values  #faster than load.txt
     adjacency_matrix = preprocess(adjacency_matrix)
@@ -133,20 +140,27 @@ def random_graph(ks):
     p_solns[-1] = 0  #lambertw is undefined at <k>=0
     return p_solns
 
-def theory(ks, alpha):
+def old_theory(ks, alpha):  #based on self-consistent equation approach
 
     p_solns = (1 + lambertw(-( 1) * np.exp(-(ks/alpha + 1)))).real
    # p_solns = 1 + lambertw(-(ks**2/2 + ks + 1) * np.exp(-(ks + 1))).real    #correct for coarser parcellation (smaller N)
     p_solns[-1] = 0  #lambertw is undefinedi at <k>=0
     return p_solns 
 
+def theory(ks, a):
+    p_soln = (1 + a/(a-2) * lambertw(-(a-2)/a * np.exp(-ks/a - 1 + 2/a))).real
+    p_soln[-1]=0
+    return p_soln
 
 
 if __name__ == '__main__':
-    which = 'density'    #tract length or tract density
-    dataset = 'dhcp'    #abcd, ukb, dhcp
+    which = 'length'    #tract length or tract density
+    dataset = 'ukb'    #abcd, ukb, dhcp
 
     filenames = ['../sample_outputs/standard/6025360_20250_2_0_{0}.txt'.format(which)] #these are all ukb dataset
+#    filenames = ['../sample_outputs/atlas/HarOx_6025360_20250_2_0_{0}.txt'.format(which)] #these are all ukb dataset
+#    filenames = ['../sample_outputs/method/Taldti_6025360_20250_2_0_{0}.txt'.format(which)] #these are all ukb dataset
+#    filenames = ['../sample_outputs/mice/mice_{0}.txt'.format(which)] #these are all ukb dataset
 #    filenames = glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, which))[:1]
 
     for f,filename in enumerate(filenames):
@@ -156,9 +170,12 @@ if __name__ == '__main__':
 
         zero_i = find_zero_index(list(avg_degrees))   #solver has trouble with nan values obtained at k=0
         popt, pcov = curve_fit(theory, avg_degrees[:zero_i], P_ones[:zero_i])
+        print(popt, pcov)
 
         fig, ax = plt.subplots()
         plt.plot(avg_degrees, theory(avg_degrees, popt[0]), label = 'theory, $\\alpha$={:.1f}'.format(popt[0]))
         plt.plot(avg_degrees, random_graph(np.array(avg_degrees)), label = 'random graph')
         plt.scatter(avg_degrees, P_ones, color='r', label='human subject')
+#        plt.scatter(avg_degrees, P_ones, color='r', label='mice (viral tracing)')
+#        plt.scatter(ori_avg_degrees, ori_P_ones, color='r', label='human subject') #for decreasing tract density 
         beautify_figure(ax, avg_degrees, P_ones, popt[0], which)
