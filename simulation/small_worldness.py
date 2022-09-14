@@ -1,7 +1,7 @@
 """
 Calculate small-world properties, such as 
 average clustering coefficient and average
-path length for our theory and compre to 
+path length for our theory and compare to 
 random graph results with the same number
 of nodes and average degree.
 
