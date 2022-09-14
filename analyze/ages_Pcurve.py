@@ -32,7 +32,7 @@ def beautify_figure(ax, avg_degrees, P_ones, alpha, exp_label):
 
 
 def sample(ks, y):  #same as Pcurve_simulations.py
-    collection = np.arange(0, 26, 0.5)  #step size of 0.5 matches simulation output
+    collection = np.arange(0, 30, 0.5) 
 
     new_y = []
     for i, a0 in enumerate(collection):
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     which = 'length'    #tract length or tract density
 
     ages = ['4 days (dHCP)', '10 years (ABCD)', '51 years (UKB)', '80 years (UKB)']
-    filenames = ['/shared/datasets/public/dhcp/derivatives/sub-CC00063AN06_ses-15102_desc-preproc_dwi_{0}.txt'.format(which), '/shared/datasets/public/abcd/derivatives/sub-NDARINVNVF8N71U_ses-baselineYear1Arm1_run-01_dwi_{0}.txt'.format(which),  '/shared/datasets/public/ukb/derivatives/6025360_20250_2_0_{0}.txt'.format(which), '/shared/datasets/public/ukb/derivatives/4482035_20250_2_0_{0}.txt'.format(which)] 
+    filenames = ['/shared/datasets/public/dhcp/derivatives/sub-CC00063AN06_ses-15102_desc-preproc_dwi_{0}.txt'.format(which), '/shared/datasets/public/abcd/derivatives/sub-NDARINVNVF8N71U_ses-baselineYear1Arm1_run-01_dwi_{0}.txt'.format(which),  '/shared/datasets/public/ukb/derivatives/dti/6025360_20250_2_0_{0}.txt'.format(which), '/shared/datasets/public/ukb/derivatives/dti/4482035_20250_2_0_{0}.txt'.format(which)] 
 
     fig, ax = plt.subplots()
     for age,filename in zip(ages, filenames):
