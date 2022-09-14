@@ -18,74 +18,88 @@ import random
 from scipy.special import lambertw
 from scipy.optimize import curve_fit
 
-sys.path.append('../analyze')
+#sys.path.append('../analyze')
+sys.path.append('/shared/home/rostam/percolating_brain/analyze')
 from Pcurve import get_k_and_P, sample_equidistant
 
-n = 100 #number of nodes	
 
-
-def theory(ks, alpha):
+def old_theory(ks, alpha):
 	p_soln = (1 + lambertw(-np.exp(-(ks/alpha + 1)))).real
 	p_soln[0]=0
 	return p_soln
 
-def make_graph(rescale_p_ngc, max_k):
+def theory(ks, a):
+    p_soln = (1 + a/(a-2) * lambertw(-(a-2)/a * np.exp(-ks/a - 1 + 2/a))).real
+    p_soln[0]=0
+    return p_soln
+
+
+def make_graph(rescale_p_ngc, max_k, n):
     Ps, ks = [],[]
+    all_nodes = list(range(n)) 
 
-    G=nx.Graph()
-    G.add_nodes_from(range(n))
+#    G=nx.Graph()
+#    G.add_nodes_from(all_nodes)
 
-    ind1,ind2 = np.random.choice(range(n), size=2, replace=False)
-    potential_edge = ((ind1, ind2))
-    G.add_edge(*potential_edge)
+    ind1,ind2 = np.random.choice(all_nodes, size=2, replace=False)
+#    potential_edge = ((ind1, ind2))
+#    G.add_edge(*potential_edge)
 
 	
     p = max_k/n
-    avgdegree = 0
+    avgdegree= 2* 2/n
+    P_one = 2* 1/n
+    Gcc = [ind1, ind2]
     while avgdegree < max_k:
-        Gcc = list(max(nx.connected_components(G), key=len))
+#    while P_one < (n-1)/n:  #issues with rounding
+#        Gcc = list(max(nx.connected_components(G), key=len))   #slow
 
         ind1 = random.choice(Gcc)	#one node must always be a part of the giant cluster
-        ind2 = random.choice(list(range(n)))	#choose from any node
-        potential_edge = ((ind1, ind2))
+        ind2 = random.choice(all_nodes)
 
-        if ind2 in Gcc:
-            if random.random() < p:
-                G.add_edge(*potential_edge)
-                avgdegree, P_one = get_k_and_P(G)
+#        potential_edge = ((ind1, ind2))
 
-                ks.append(avgdegree)
-                Ps.append(P_one)
+        if ind2 in Gcc and ind1!=ind2:
+            if random.random() < p/2 and ind1!=ind2:# and not G.has_edge(*potential_edge): #no diff, adding edge again does not overwrite
+ #               G.add_edge(*potential_edge)  slow, no need to formally create graph and calculate properties
+#                avgdegree, P_one = get_k_and_P(G)
+                avgdegree+=2/n
+
+#                ks.append(avgdegree)   
+#                Ps.append(P_one)
         else:
             if random.random() < p/rescale_p_ngc:
-                G.add_edge(*potential_edge)
-                avgdegree, P_one = get_k_and_P(G)
+#                G.add_edge(*potential_edge)
+#                avgdegree, P_one = get_k_and_P(G)
 
+                avgdegree+=2/n
+                P_one+=1/n
+                Gcc.append(ind2)
                 ks.append(avgdegree)
                 Ps.append(P_one)
-
+    print(avgdegree, P_one)
     return np.array(ks), np.array(Ps)
 
 
 def add_label(alpha, which):    #need to manually add legend labels cuz violinplots not compatible
     labels = []
 
-    if alpha:
-        labels.append((Line2D([0], [0], color='#1f77b4') , 'theory, $\\alpha$={:.1f}'.format(alpha)))	
-        labels.append((Line2D([0], [0], color='#d62728') , 'simulation, $\\alpha$={:.1f}'.format(alpha)))	
-    elif which:
-        labels.append((Line2D([0], [0], color='#1f77b4') , 'theory'))	
-        labels.append((mpatches.Patch(color='#d62728'), 'model simulation'))
+    if which:
+        labels.append((Line2D([0], [0], color='#1f77b4') , 'theory, $\\alpha = ${0}'.format(alpha)))	
+        labels.append((mpatches.Patch(color='#d62728'), 'model simulation, $\\alpha = ${0}'.format(alpha)))
     else:
-        labels.append((Line2D([0], [0], color='#1f77b4') , 'theory'))	
-        labels.append((Line2D([0], [0], color='#d62728'), 'simulation'))
-            
+        labels.append((Line2D([0], [0], color='#1f77b4') , 'numerical solution'))	
+        labels.append((Line2D([0], [0], color='#ff7f0e') , 'analytical equation'.format(alpha)))	
+        labels.append((mpatches.Patch(color='#d62728'), 'simulation'.format(alpha)))
+
     return labels
 
 def plotout(collection, output, pred_output, alpha, which):
+    
     plt.plot(collection, pred_output, label = 'theory') #label in legend not set here
-    plt.plot(0,0)	#cycle through colors to get to red
-    plt.plot(0,0)   #hard to set color of violinplot
+    plt.plot(0,0)	#cycle through colors to get to red #hard to set color of violinplot
+    if which:
+        plt.plot(0,0)   
     plt.violinplot(output, positions = collection, showmeans=True, showmedians=True)#, showextrema=False)
 
     labels = add_label(alpha, which)    #set legend labels
@@ -96,30 +110,52 @@ def plotout(collection, output, pred_output, alpha, which):
     plt.xlabel('average degree $\langle k \\rangle$', fontsize = 14 )
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
+    plt.title('$\\alpha = ${0}'.format(alpha), fontsize=14)
     if which:
         plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack", fontsize=16)
 
     plt.tight_layout()
     plt.show()
 
+#    plt.savefig('{0}_long.png'.format(which))  #for saving figure directly
+ #   plt.close() 
+
+def numerics_theory(N_edges, a, n):
+    Ps = []
+    ks = []
+
+    n_e =0
+    P=1/n
+
+    ks.append(n_e/n)
+    Ps.append(P)
+    while n_e<N_edges:
+        pre_term = (P* n*(1-P))/( (P* n*(1-P)) + a*P*(n*P-1)/2 - a*n_e/(2*n) )
+        P+= pre_term/n 
+        Ps.append(P)
+        n_e+=2 
+        ks.append(n_e/n)
+
+    return ks,Ps
+
 
 
 if __name__ == '__main__':
     repeat = 10#00
 
-    max_k = 20  #maximum average degree of graph
-    rescale_p_ngc_gc = 5
-    alpha = (rescale_p_ngc_gc)*2 + 1
+    n = 100 #727
+    max_k = 50  #100  #maximum average degree of graph
+    alpha = 11
 
-    collection = np.arange(0, max_k, 0.5)
+    collection = np.arange(0, 20, 0.5)
     output = [[] for _ in collection]
 
 
-    check_alpha_dist = False
+    check_alpha_dist = False#True
     alphas = [] #to check theory alpha match with fitted alpha
     for r in range(repeat):
         print(r)	
-        ks, result = make_graph(rescale_p_ngc_gc, max_k)
+        ks, result = make_graph(alpha, max_k, n)
         for i, a0 in enumerate(collection): #save Ps closeset to target <k> for accurate error bars
             indi = (np.abs(ks-a0).argmin())
             output[i].append(result[indi])
@@ -134,4 +170,6 @@ if __name__ == '__main__':
         plt.show()
 
     pred_output = theory(collection, alpha)
+    ks, pred_output3 = numerics_theory(n*max(collection), alpha, n)
+    plt.plot(ks, pred_output3)
     plotout(collection, output, pred_output, alpha, "")
