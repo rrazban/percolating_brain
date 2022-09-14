@@ -38,12 +38,12 @@ def make_graph(rescale_p_ngc, max_k, n):
     Ps, ks = [],[]
     all_nodes = list(range(n)) 
 
-#    G=nx.Graph()
-#    G.add_nodes_from(all_nodes)
+    G=nx.Graph()
+    G.add_nodes_from(all_nodes)
 
     ind1,ind2 = np.random.choice(all_nodes, size=2, replace=False)
-#    potential_edge = ((ind1, ind2))
-#    G.add_edge(*potential_edge)
+    potential_edge = ((ind1, ind2))
+    G.add_edge(*potential_edge)
 
 	
     p = max_k/n
@@ -57,28 +57,25 @@ def make_graph(rescale_p_ngc, max_k, n):
         ind1 = random.choice(Gcc)	#one node must always be a part of the giant cluster
         ind2 = random.choice(all_nodes)
 
-#        potential_edge = ((ind1, ind2))
+        potential_edge = ((ind1, ind2))
 
-        if ind2 in Gcc and ind1!=ind2:
-            if random.random() < p/2 and ind1!=ind2:# and not G.has_edge(*potential_edge): #no diff, adding edge again does not overwrite
- #               G.add_edge(*potential_edge)  slow, no need to formally create graph and calculate properties
-#                avgdegree, P_one = get_k_and_P(G)
-                avgdegree+=2/n
-
-#                ks.append(avgdegree)   
-#                Ps.append(P_one)
+        if ind2 in Gcc:
+            if not G.has_edge(*potential_edge) and ind1!=ind2:  #no repeating edges, no self-loops
+                if random.random() < p/2:
+                    G.add_edge(*potential_edge)  
+                    avgdegree+=2/n
         else:
             if random.random() < p/rescale_p_ngc:
-#                G.add_edge(*potential_edge)
-#                avgdegree, P_one = get_k_and_P(G)
+                G.add_edge(*potential_edge)
 
                 avgdegree+=2/n
                 P_one+=1/n
                 Gcc.append(ind2)
                 ks.append(avgdegree)
                 Ps.append(P_one)
+
     print(avgdegree, P_one)
-    return np.array(ks), np.array(Ps)
+    return G, np.array(ks), np.array(Ps)
 
 
 def add_label(alpha, which):    #need to manually add legend labels cuz violinplots not compatible
@@ -155,7 +152,7 @@ if __name__ == '__main__':
     alphas = [] #to check theory alpha match with fitted alpha
     for r in range(repeat):
         print(r)	
-        ks, result = make_graph(alpha, max_k, n)
+        _, ks, result = make_graph(alpha, max_k, n)
         for i, a0 in enumerate(collection): #save Ps closeset to target <k> for accurate error bars
             indi = (np.abs(ks-a0).argmin())
             output[i].append(result[indi])
