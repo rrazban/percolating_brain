@@ -32,7 +32,8 @@ def plotout(xs, ys, which, dataset):
 
 
     plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack ({0})".format(dataset_title), fontsize=14)  #default size is 12
-    plt.ylabel('modularity $\\alpha$', fontsize=14)
+    plt.ylabel('growth parameter $\\alpha$', fontsize=14)
+   # plt.ylabel('standard error of modularity $\\alpha$', fontsize=14)
 
     if dataset=='dhcp':
         plt.xlabel('gestational age in weeks', fontsize=14)
@@ -49,8 +50,8 @@ def plotout(xs, ys, which, dataset):
 
 
 if __name__ == '__main__':
-    dataset = 'ukb' #ukb, abcd, dhcp
-    which = 'length'    #length or density
+    dataset = 'dhcp' #ukb, abcd, dhcp
+    which = 'density'    #length or density
 
     alpha_file = './{0}.csv'.format(dataset)
     alpha_output = pd.read_csv(alpha_file)
