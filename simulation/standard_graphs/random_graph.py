@@ -18,8 +18,6 @@ sys.path.append('../../analyze')
 from Pcurve import get_k_and_P
 
 
-n = 100 #adjust to match number of nodes in parcellation 
-
 
 def add_label(label):    #need to manually add legend labels cuz violinplots not compatible
     labels = []
@@ -42,11 +40,10 @@ def plotout(collection, output, label):
     plt.show()
 
 
-def make_graph():
+def make_graph(n, max_k):
     Ps = []
     ks = []
 
-    max_k = 14
     p = max_k/n
 
     #copied from gnp_random_graph source code
@@ -58,7 +55,7 @@ def make_graph():
     edges = list(edges)
     random.shuffle(edges)
 
-    for e in edges:
+    for e in edges: #could equivalently make independent graph at certain k
         if random.random() < p:
             G.add_edge(*e)
 
@@ -68,21 +65,24 @@ def make_graph():
 
     return np.array(ks), np.array(Ps)
 
+d_n_max_k = {'Harvard-Oxford': (64, 25.53), 'Talairach': (727, 29.93)}
 
 if __name__ == '__main__':
     repeat = 10#00
 
-    collection = np.arange(0, 14, 0.5)
+    atlas = 'Harvard-Oxford'
+#    atlas = 'Talairach'
+    n, max_k = d_n_max_k[atlas]
+
+    collection = np.arange(0, int(max_k+0.5), 0.5)  #match range of atlas
     output = [[] for _ in collection]
 
     for r in range(repeat):
-        ks, result = make_graph()
+        ks, result = make_graph(n, max_k)
         for i, a0 in enumerate(collection):
             indi = (np.abs(ks-a0).argmin())
             output[i].append(result[indi])
 
-#    print(list(collection))
-#    print(output)   #copy and paste into saved_outputs.py, 1000 repeats
+    print(list(collection))
+    print(output)   #copy and paste into saved_outputs.py, 1000 repeats
     plotout(collection, output, 'random graph')
-
-

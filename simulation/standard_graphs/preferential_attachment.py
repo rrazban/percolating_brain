@@ -1,7 +1,7 @@
 """
 Generate the percolation probability curve for
 a scale-free graph (probability of edge formation
-depends on node degree)
+depends linearly on node degree)
 
 """
 
@@ -12,13 +12,11 @@ import numpy as np
 import random
 import itertools
 
-from random_graph import plotout
+from random_graph import plotout, d_n_max_k
 
 sys.path.append('../../analyze')
 from Pcurve import get_k_and_P
 
-
-n = 727 
 
 
 def setup_edges(n):
@@ -34,7 +32,7 @@ def setup_edges(n):
     return edge_per_node
 
 
-def make_graph():
+def make_graph(n, k):
     Ps = []
     ks = []
 
@@ -89,11 +87,15 @@ def make_graph():
 if __name__ == '__main__':
     repeat = 10#00
 
-    collection = np.arange(0, 14, 0.5)
-    output = [[] for _ in collection]
+    atlas = 'Harvard-Oxford'
+#    atlas = 'Talairach'
+    n, max_k = d_n_max_k[atlas]
 
+    collection = np.arange(0, int(max_k+0.5), 0.5)  #match range of atlas
+
+    output = [[] for _ in collection]
     for r in range(repeat):
-        ks, result = make_graph()
+        ks, result = make_graph(n, max_k)
         for i, a0 in enumerate(collection):
             indi = (np.abs(ks-a0).argmin())
             output[i].append(result[indi])

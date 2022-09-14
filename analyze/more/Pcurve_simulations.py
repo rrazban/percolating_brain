@@ -1,6 +1,7 @@
 """
 Compare percolation probability curve with numerical
-results from simulations of standard graphs.
+results from simulations of standard graphs: random 
+graph and scale-free graph.
 
 """
 
@@ -12,11 +13,14 @@ import pandas as pd
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 
-sys.path.append('../')
+#sys.path.append('../')
+sys.path.append('/shared/home/rostam/percolating_brain/analyze')
 from Pcurve import preprocess, break_apart 
 
-sys.path.append('../../simulation/standard_graphs/')
+#sys.path.append('../../simulation/standard_graphs/')
+sys.path.append('/shared/home/rostam/percolating_brain/simulation/standard_graphs')
 import saved_outputs
+from random_graph import d_n_max_k
 
 
 
@@ -28,15 +32,10 @@ def plotout(x, y, xlabel, ylabel, exp_label):
     k_random, P_random = d_readin['{0} {1}'.format('random graph', N)]()
     plt.violinplot(P_random, positions = k_random, showmeans=True, showmedians=True, showextrema=False)
 
-    k_roi, P_roi = d_readin['{0} {1}'.format('roi random', N)]()
-    plt.violinplot(P_roi, positions = k_roi, showmeans=True, showmedians=True, showextrema=False)
-
-    plt.plot(0,0)   #dark red color looks to similiar to the red color for experiment
-    k_pref, P_pref = d_readin['{0}'.format('preferential attachment')]()
+    k_pref, P_pref = d_readin['{0} {1}'.format('preferential attachment', N)]()
     plt.violinplot(P_pref, positions = k_pref, showmeans=True, showmedians=True, showextrema=False)
 
     labels = add_label()
-   # plt.legend(*zip(*labels), loc= (0.61, 0.55), prop={'size':12})
     plt.legend(*zip(*labels), loc= (0.61, 0.52), prop={'size':12})
 
     plt.xlabel(xlabel, fontsize = 14)   #default size is 10
@@ -56,8 +55,6 @@ def plotout(x, y, xlabel, ylabel, exp_label):
 
     axins.plot(0,0) 
     axins.violinplot(P_random, positions = k_random, showmeans=True, showmedians=True, showextrema=False)
-    axins.violinplot(P_roi, positions = k_roi, showmeans=True, showmedians=True, showextrema=False)
-    axins.plot(0,0)
     axins.violinplot(P_pref, positions = k_pref, showmeans=True, showmedians=True, showextrema=False)
 
     x1, x2, y1, y2 = -0.03, 2, -0.03, 0.51
@@ -82,8 +79,7 @@ def get_experimental_data(filename):
     return avg_degrees, P_ones, len(adjacency_matrix)
 
 
-def sample(ks, y):
-    collection = np.arange(0, 26, 0.5)  #step size of 0.5 matches simulation output
+def sample(ks, y, collection):
 
     new_y = []
     for i, a0 in enumerate(collection):
@@ -97,22 +93,32 @@ def add_label():
     labels = []
 
     labels.append((mpatches.Patch(color='#ff7f0e'), 'random graph')) #color exactly set to match violinplot light blue
-    labels.append((mpatches.Patch(color='#2ca02c'), 'random ROI'))
-    labels.append((mpatches.Patch(color='#9467bd'), 'pref attachment'))
+    labels.append((mpatches.Patch(color='#2ca02c'), 'pref attachment'))
     labels.append((Line2D([0], [0], marker='o',color='white',markerfacecolor='r', markersize=8), 'human subject'))
     return labels
 
-d_readin = {'roi random 426': saved_outputs.roi_random_426, 'roi random 84': saved_outputs.roi_random_84, 'roi random 727': saved_outputs.roi_random_727,'random graph 64': saved_outputs.random_64, 'random graph 84': saved_outputs.random_84, 'random graph 426': saved_outputs.random_426, 'random graph 727': saved_outputs.random_727, 'preferential attachment': saved_outputs.prefattach, 'clustered random graph': saved_outputs.random_clustered, 'lattice brain': saved_outputs.lattice_brain, 'roi random 64': saved_outputs.roi_random_64}
+
+
+d_readin = {'roi random 727': saved_outputs.roi_random_727,'random graph 64': saved_outputs.random_64, 'random graph 727': saved_outputs.random_727, 'preferential attachment 64': saved_outputs.prefattach_64, 'preferential attachment 727': saved_outputs.prefattach_727, 'roi random 64': saved_outputs.roi_random_64}
+
 
 if __name__ == '__main__':
     which = 'density'    #tract length or tract density
-    dataset = 'ukb'    #abcd or ukb
 
-    filenames = ['../../sample_outputs/standard/6025360_20250_2_0_{0}.txt'.format(which)]
+#    atlas = 'Harvard-Oxford'
+    atlas = 'Talairach'
+    n, max_k = d_n_max_k[atlas]
+    collection = np.arange(0, int(max_k+0.5), 0.5)
+
+    if atlas=='Harvard-Oxford':
+        filenames = ['../../sample_outputs/atlas/HarOx_6025360_20250_2_0_{0}.txt'.format(which)]
+    elif atlas=='Talairach':
+        filenames = ['../../sample_outputs/standard/6025360_20250_2_0_{0}.txt'.format(which)]
+
 
     for f,filename in enumerate(filenames):
         print(filename)
         ori_avg_degrees, ori_P_ones, N = get_experimental_data(filename)
-        avg_degrees, P_ones = sample(ori_avg_degrees, ori_P_ones) 
+        avg_degrees, P_ones = sample(ori_avg_degrees, ori_P_ones, collection) 
 
         plotout(avg_degrees, P_ones, 'average degree $\langle k \\rangle$', 'probability in the giant cluster $P$', which)
