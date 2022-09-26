@@ -16,7 +16,7 @@ import random
 from theory import plotout, theory
 
 sys.path.append('../analyze')
-from Pcurve import get_k_and_P, preprocess, break_apart, sample_equidistant, curve_fit
+from Pcurve import preprocess, break_apart, sample_equidistant, curve_fit
 
 
 
@@ -76,7 +76,7 @@ def make_graph(n, rescale_p_ngc):
     ind1,ind2 = np.random.choice(all_nodes, size=2, replace=False)
     first_edge = ((ind1, ind2))
 
-    avgdegree= 2* 2/n
+    avgdegree= 2/n
     P_one = 2* 1/n
     Gcc = [ind1, ind2]
 
@@ -171,7 +171,7 @@ def fit_alpha(ks, Ps):
 if __name__ == '__main__':
     repeat = 10#00
 
-    n = 100 
+    n = 100
     alpha = 11
 
     if n==727:

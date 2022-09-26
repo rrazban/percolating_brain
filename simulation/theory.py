@@ -45,9 +45,8 @@ def make_graph(rescale_p_ngc, max_k, n):
     potential_edge = ((ind1, ind2))
     G.add_edge(*potential_edge)
 
-	
     p = max_k/n
-    avgdegree= 2* 2/n
+    avgdegree= 2/n
     P_one = 2* 1/n
     Gcc = [ind1, ind2]
     while avgdegree < max_k:
