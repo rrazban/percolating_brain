@@ -21,6 +21,7 @@ from scipy.optimize import curve_fit
 #sys.path.append('../analyze')
 sys.path.append('/shared/home/rostam/percolating_brain/analyze')
 from Pcurve import get_k_and_P, sample_equidistant
+from stochastic_numerics import numerics_theory, transform_p_to_matrix, get_mean_std 
 
 
 def old_theory(ks, alpha):
@@ -92,7 +93,7 @@ def add_label(alpha, which):    #need to manually add legend labels cuz violinpl
 
 def plotout(collection, output, pred_output, alpha, which):
     
-    plt.plot(collection, pred_output, label = 'theory') #label in legend not set here
+    plt.plot(collection, pred_output, label = 'theory', zorder=20) #label in legend not set here
     plt.plot(0,0)	#cycle through colors to get to red #hard to set color of violinplot
     if which:
         plt.plot(0,0)   
@@ -113,10 +114,10 @@ def plotout(collection, output, pred_output, alpha, which):
     plt.tight_layout()
     plt.show()
 
-#    plt.savefig('{0}_long.png'.format(which))  #for saving figure directly
+#    plt.savefig('{0}_long.png'.format(which))  #for saving figure directly  #make sure X11 is opened, need to be actively on computer node for sucessful save
  #   plt.close() 
 
-def numerics_theory(N_edges, a, n):
+def no_stochasticity_numerics_theory(N_edges, a, n):
     Ps = []
     ks = []
 
@@ -139,13 +140,12 @@ def numerics_theory(N_edges, a, n):
 if __name__ == '__main__':
     repeat = 10#00
 
-    n = 100 #727
-    max_k = 50  #100  #maximum average degree of graph
+    n = 100 
+    max_k = 50  #maximum average degree of graph
     alpha = 11
 
     collection = np.arange(0, 20, 0.5)
     output = [[] for _ in collection]
-
 
     check_alpha_dist = False#True
     alphas = [] #to check theory alpha match with fitted alpha
@@ -166,6 +166,14 @@ if __name__ == '__main__':
         plt.show()
 
     pred_output = theory(collection, alpha)
-    ks, pred_output3 = numerics_theory(n*max(collection), alpha, n)
-    plt.plot(ks, pred_output3)
+#    ks, pred_output3 = no_stochasticity_numerics_theory(n*max(collection), alpha, n)
+
+    E_tot = int(n*max(collection)/2)#divide by 2 to avoid overcounting
+    d_p = numerics_theory(E_tot, alpha, n)
+    M_mean, M_var = transform_p_to_matrix(d_p, n, E_tot)
+    mean, std = get_mean_std(M_mean, M_var)
+
+    freq = int(E_tot/(len(collection)-1))
+    plt.errorbar(collection, mean[::freq], yerr=std[::freq], zorder=10) 
+
     plotout(collection, output, pred_output, alpha, "")
