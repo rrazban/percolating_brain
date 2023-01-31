@@ -99,7 +99,7 @@ def add_label():
 
 
 
-d_readin = {'roi random 727': saved_outputs.roi_random_727,'random graph 64': saved_outputs.random_64, 'random graph 727': saved_outputs.random_727, 'preferential attachment 64': saved_outputs.prefattach_64, 'preferential attachment 727': saved_outputs.prefattach_727, 'roi random 64': saved_outputs.roi_random_64}
+d_readin = {'roi random 727': saved_outputs.roi_random_727,'random graph 64': saved_outputs.random_64, 'random graph 727': saved_outputs.random_727, 'preferential attachment 64': saved_outputs.prefattach1_64, 'preferential attachment 727': saved_outputs.prefattach1_727, 'roi random 64': saved_outputs.roi_random_64}
 
 
 if __name__ == '__main__':
