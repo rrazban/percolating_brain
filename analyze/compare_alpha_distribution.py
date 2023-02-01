@@ -8,7 +8,6 @@ categorical value for UK Biobank. Categories include:
 """
 
 
-import sys, os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -64,7 +63,7 @@ if __name__ == '__main__':
     which = 'length'
     category = 'sex' #bipolar/depression, diabetes or sex 
 
-    alpha_file = 'ukb.csv' #this analysis is only for ukb
+    alpha_file = 'database_output/ukb.csv' #this analysis is only implemented for ukb
     alphas = pd.read_csv(alpha_file)
 
     if which=='density':

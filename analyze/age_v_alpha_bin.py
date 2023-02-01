@@ -22,7 +22,6 @@ def plotout(xs, ys, which, dataset):
     bins = np.diff(bins)/2.+bins[:-1]
     plt.errorbar(bins, means, yerr = std, fmt='o-',markersize=8, capsize=6, color='r', label='$\\rho=$ {0:.2f} ({1:.2E})\n$N=$ {2}'.format(rho, pval, len(xs)))
 
-
     if dataset=='ukb':
         dataset_title = 'UK Biobank'
     elif dataset=='abcd':
@@ -32,8 +31,8 @@ def plotout(xs, ys, which, dataset):
 
 
     plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack ({0})".format(dataset_title), fontsize=14)  #default size is 12
+#    plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack (UKB, dti)".format(dataset_title), fontsize=14)  #default size is 12
     plt.ylabel('growth parameter $\\alpha$', fontsize=14)
-   # plt.ylabel('standard error of modularity $\\alpha$', fontsize=14)
 
     if dataset=='dhcp':
         plt.xlabel('gestational age in weeks', fontsize=14)
@@ -50,10 +49,10 @@ def plotout(xs, ys, which, dataset):
 
 
 if __name__ == '__main__':
-    dataset = 'dhcp' #ukb, abcd, dhcp
+    dataset = 'ukb' #ukb, abcd, dhcp
     which = 'density'    #length or density
 
-    alpha_file = './{0}.csv'.format(dataset)
+    alpha_file = 'database_output/{0}_dti.csv'.format(dataset)
     alpha_output = pd.read_csv(alpha_file)
     if which=='density':
         d_alpha = dict(zip(alpha_output.id, alpha_output.alpha_density))
