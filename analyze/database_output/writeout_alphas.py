@@ -6,17 +6,19 @@ UK Biobank, ABCD Study or dHCP.
 
 """
 
-
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import glob
 from multiprocessing import Pool
 from scipy.optimize import curve_fit
-
-from Pcurve import get_experimental_data, find_zero_index, theory, sample_equidistant
 from scipy.stats import spearmanr
 from datetime import datetime 
+
+sys.path.append('../')
+from Pcurve import get_experimental_data, find_zero_index, theory, sample_equidistant
+
 
 
 def get_ids_abcd(filenames):
@@ -75,11 +77,11 @@ if __name__ == '__main__':
     start_time = datetime.now()    
     print("Start time: {0}".format(start_time))
 
-    dataset = 'dhcp'    #abcd, ukb, dhcp
+    dataset = 'abcd'    #abcd, ukb, dhcp
 
     collect = []
     for which in ['density', 'length']: 
-        filenames = sorted(glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, which)))#[:2]
+        filenames = sorted(glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, which)))   #not provided in github, need to access dMRI images from respective dataset and generate individual output for yourselves from process/dmri2adjacency_matrix.py
 
         print("working on {0} dataset's {1}.txt files, N={2}".format(dataset, which, len(filenames)))
 
@@ -97,7 +99,7 @@ if __name__ == '__main__':
 
     df = pd.DataFrame(list(zip(*[eids, collect[0], collect[1]])))
     df.columns = ['id', 'alpha_density', 'alpha_length']
-    df.to_csv('{0}.csv'.format(dataset), index=False)
+    df.to_csv('{0}_check.csv'.format(dataset), index=False)
 
     end_time = datetime.now()
     print("End time: {0}".format(end_time))
