@@ -1,7 +1,7 @@
 """
 Calculate numerical solution for probability of 
 a given graph with n nodes and E edges according
-to our percolation theory.
+to our Giant Cluster Self Preference theory (Equation 5).
 
 """
 

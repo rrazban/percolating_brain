@@ -5,9 +5,17 @@ correlation. Write out vales to a text file
 named by the respective database, 
 UK Biobank, ABCD Study or dHCP.
 
+
+Note that this script cannot be run because 
+output files are not provided in the Github
+directory. Output files must be generated from 
+process/dmri2adjacency_matrix.py after 
+acquiring dMRI scans from respective dataset.
+
 """
 
 
+import sys
 import numpy as np
 import pandas as pd
 import glob
@@ -15,12 +23,14 @@ from multiprocessing import Pool, set_start_method
 import networkx as nx
 
 from writeout_alphas import get_ids_abcd, get_ids_ukb, get_ids_dhcp
-from Pcurve import get_experimental_data, preprocess
 from scipy.stats import spearmanr
 from datetime import datetime 
 
 
-set_start_method("spawn", force=True)   #not sure if this helps
+sys.path.append('../')
+from Pcurve import preprocess
+
+set_start_method("spawn", force=True)   #not sure if this helps the multiprocessing
 #https://pythonspeed.com/articles/python-multiprocessing/
 
 
@@ -52,7 +62,7 @@ if __name__ == '__main__':
 
     dataset = 'abcd'    #abcd, ukb, dhcp
 
-    filenames = sorted(glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, 'density')))#[:500]#[:2]
+    filenames = sorted(glob.glob('/shared/datasets/public/{0}/derivatives/*_{1}.txt'.format(dataset, 'density')))
 
     print("working on {0} dataset, N={1}".format(dataset,len(filenames)))
 

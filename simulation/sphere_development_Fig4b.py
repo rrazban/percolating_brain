@@ -1,8 +1,9 @@
 """
 Generate the percolation probability curve based 
-on targeted attack of model based on fasciculation
-and scaling. Theory that assumes no secondary 
-cluster formation is also included
+on Early Path Dominance model described in the 
+main text.
+
+Creates Figure 4b of the main text.
 
 """
 
@@ -16,14 +17,18 @@ import random
 from theory import plotout, theory
 
 sys.path.append('../analyze')
-from Pcurve import preprocess, break_apart, sample_equidistant, curve_fit
+from Pcurve_Fig2 import preprocess, break_apart, sample_equidistant, curve_fit
 
 
-
+#set the average degree such that all simulations have P=1 at the end
+#based on the number of nodes
 d_k_alpha11 = {100: 50, 727:100}
+
+#set rescaling of sphere radius based on the number of nodes
 d_radius_gr = {100: 1.001, 727: 1.0001}
 
 
+#calculate the Euclidean distances between coordinates
 def get_distances(M_density, coords):
     M_dist = np.zeros((n, n))
     pairs = np.nonzero(M_density)
@@ -38,6 +43,7 @@ def get_distances(M_density, coords):
     return M_dist
 
 
+#generate random coordinate of new node within unit sphere
 def random_coord(amt):
     dx = random.uniform(0,amt) * random.choice([-1,1])
 
@@ -65,6 +71,7 @@ def make_graph(n, rescale_p_ngc):
 
     #parameters to grow graph
     max_k = d_k_alpha11[n] 
+#    max_k = 25.5
     p = max_k/n 
 
     initial_density = 1
@@ -169,9 +176,9 @@ def fit_alpha(ks, Ps):
     return popt[0]
 
 if __name__ == '__main__':
-    repeat = 10#00
+    repeat = 5#00
 
-    n = 100
+    n = 727 
     alpha = 11
 
     if n==727:
@@ -204,6 +211,7 @@ if __name__ == '__main__':
         plt.hist(alphas_density, label='density')
         plt.legend()
         plt.show()
+
 
     pred_output = theory(collection, alpha)
     plotout(collection, output_standard, pred_output, alpha, 'standard')

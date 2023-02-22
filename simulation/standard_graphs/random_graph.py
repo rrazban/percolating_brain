@@ -15,7 +15,7 @@ import random
 import itertools
 
 sys.path.append('../../analyze')
-from Pcurve import get_k_and_P
+from Pcurve_Fig2 import get_k_and_P
 
 
 
@@ -56,19 +56,24 @@ def make_graph(n, max_k):
     random.shuffle(edges)
 
     for e in edges: #could equivalently make independent graph at certain k
+        print(e)
         if random.random() < p:
             G.add_edge(*e)
 
-            avgdegree, P_one = get_k_and_P(G)
-            ks.append(avgdegree)
-            Ps.append(P_one)
+            if random.random()<1/10:    #record 10%
+                avgdegree, P_one = get_k_and_P(G)
 
+                ks.append(avgdegree)
+                Ps.append(P_one)
+                print(avgdegree, P_one)
+
+    print('done!')
     return np.array(ks), np.array(Ps)
 
 d_n_max_k = {'Harvard-Oxford': (64, 25.53), 'Talairach': (727, 29.93)}
 
 if __name__ == '__main__':
-    repeat = 10#00
+    repeat = 1#0#00
 
     atlas = 'Harvard-Oxford'
 #    atlas = 'Talairach'
@@ -78,11 +83,14 @@ if __name__ == '__main__':
     output = [[] for _ in collection]
 
     for r in range(repeat):
+        print(r)
         ks, result = make_graph(n, max_k)
-        for i, a0 in enumerate(collection):
-            indi = (np.abs(ks-a0).argmin())
-            output[i].append(result[indi])
-
+        plt.scatter(ks, result)
+        #for i, a0 in enumerate(collection):
+         #   indi = (np.abs(ks-a0).argmin())
+          #  output[i].append(result[indi])
+    plt.show()
+    sys.exit()
     print(list(collection))
     print(output)   #copy and paste into saved_outputs.py, 1000 repeats
     plotout(collection, output, 'random graph')

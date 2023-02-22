@@ -3,6 +3,9 @@ Plot distribution of cluster sizes for
 random graphs constructed at various 
 average degrees. 
 
+Creates left graph of Figure S4 in the 
+Supplement.
+
 """
 
 import os, sys
@@ -10,8 +13,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
-sys.path.append('../../analyze')
-from Pcurve import get_k_and_P 
+sys.path.append('../../../analyze')
+from Pcurve_Fig2 import get_k_and_P 
 
 
 

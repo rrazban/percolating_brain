@@ -3,6 +3,9 @@ Check that the alpha vs age relationship is not
 biased by the final average degree (kf) of the 
 network.
 
+Creates the bottom graphs of Figure S18 in the 
+Supplement.
+
 """
 
 

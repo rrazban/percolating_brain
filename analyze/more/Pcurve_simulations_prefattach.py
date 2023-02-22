@@ -3,6 +3,8 @@ Compare percolation probability curve with numerical
 results from simulations of general preferential 
 attachment models
 
+Creates Figure S7 in the Supplement.
+
 """
 
 
@@ -14,12 +16,10 @@ from matplotlib.lines import Line2D
 
 from Pcurve_simulations import get_experimental_data, sample
 
-#sys.path.append('../')
-sys.path.append('/shared/home/rostam/percolating_brain/analyze')
-from Pcurve import preprocess, break_apart 
+sys.path.append('../')
+from Pcurve_Fig2 import preprocess, break_apart 
 
-#sys.path.append('../../simulation/standard_graphs/')
-sys.path.append('/shared/home/rostam/percolating_brain/simulation/standard_graphs')
+sys.path.append('../../simulation/standard_graphs/')
 import saved_outputs
 from random_graph import d_n_max_k
 
@@ -42,7 +42,6 @@ def plotout(x, y, xlabel, ylabel, exp_label):
 
 
     labels = add_label()
-#    plt.legend(*zip(*labels), loc= (0.61, 0.52), prop={'size':12})
     plt.legend(*zip(*labels), prop={'size':12})
 
     plt.xlabel(xlabel, fontsize = 14)   #default size is 10

@@ -17,7 +17,7 @@ sys.path.append('../../process/atlas')
 import roi_coordinates
 
 sys.path.append('../../analyze')
-from Pcurve import break_apart
+from Pcurve_Fig2 import break_apart
 
 
 d_readin_coords = {'Harvard-Oxford': roi_coordinates.Harvard_Oxford, 'Desikan-Killiany': roi_coordinates.Desikan_Killiany, 'Talairach': roi_coordinates.Talairach}

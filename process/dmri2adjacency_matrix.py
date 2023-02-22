@@ -7,6 +7,9 @@ Closely follows the DIPY tutorial for generating
 the connectivity matrix
 https://dipy.org/documentation/1.3.0./examples_built/streamlines_analysis/streamline_tools/
 
+Note that to run this script, you must first acquire
+dMRI scans from the respective dataset.
+
 """
 
 
@@ -24,7 +27,7 @@ from dipy.tracking.local_tracking import LocalTracking
 from dipy.tracking.stopping_criterion import BinaryStoppingCriterion
 from dipy.tracking.streamline import Streamlines
 from dipy.tracking.streamline import length
-#from dipy.reconst.dti import TensorModel
+from dipy.reconst.dti import TensorModel
 
 
 from nilearn import image
@@ -59,7 +62,7 @@ def get_remaining_abcd(fnames, pre_done_already):
 
 
 
-def get_dMRI(dataset):
+def get_dMRI(dataset):  #have following directories correctly set to location of output files and input files
     done_already = glob('/shared/datasets/public/{0}/derivatives/*_density.txt'.format(dataset))   #output data files
     done_already = [fname.split('/')[-1].replace('_density.txt', '') for fname in done_already]
 
@@ -171,7 +174,8 @@ def compute_features(fname, labels, labels_img, white_matter_label, dataset):
   gtab = gradient_table(bvals, bvecs)
   white_matter = binary_dilation((labels == white_matter_label))
 
-#  ten_model = TensorModel(gtab)  #can set csamodel = ten_model to check out dti method
+ # ten_model = TensorModel(gtab)  #can set csamodel = ten_model to check out dti method
+#  csamodel=ten_model
   csamodel = shm.CsaOdfModel(gtab, 6)   #default
   csapeaks = peaks.peaks_from_model(model=csamodel,
                                     data=data,
@@ -202,7 +206,7 @@ def compute_features(fname, labels, labels_img, white_matter_label, dataset):
      M[r, :] = 0
      M[:, r] = 0
 
-  out_dir = '/shared/datasets/public/{0}/derivatives'.format(dataset) 
+  out_dir = '/shared/datasets/public/{0}/derivatives'.format(dataset)   #have this set to where you want output to go 
   np.savetxt('{0}/{1}'.format(out_dir, subj.replace('.zip', '_density.txt')), M)
   M_lengths = restructure(M, grouping)
   np.savetxt('{0}/{1}'.format(out_dir, subj.replace('.zip', '_length.txt')), M_lengths)
@@ -217,7 +221,7 @@ def compute_features(fname, labels, labels_img, white_matter_label, dataset):
 if __name__ == '__main__':
     dataset = 'ukb' #ukb, abcd, dhcp
 
-    dMRIs = get_dMRI(dataset)
+    dMRIs = get_dMRI(dataset)#[:5]
     print("Number of jobs: {0}".format(len(dMRIs)), flush=True) 
     start_time = datetime.datetime.now()
     print("Start time: {0}".format(start_time), flush=True)
@@ -226,8 +230,8 @@ if __name__ == '__main__':
     for dMRI in dMRIs:
         compute_features(dMRI, labels, labels_img, white_matter_label, dataset) 
 
-
-#    with Pool(2) as p:      #optimized for 32 proc #note that dipy already recruites more than 1 proc per job  #does not work well for dHCP, need to run only 1 at a time per cluster
+    #speed up processing by running in parallel
+#    with Pool(5) as p:
  #       prod_x = partial(compute_features, labels=labels, labels_img=labels_img, white_matter_label=white_matter_label, dataset=dataset)
   #      p.map(prod_x, dMRIs)
 

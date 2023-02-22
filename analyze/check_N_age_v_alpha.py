@@ -3,6 +3,8 @@ Check that the alpha vs age relationship is not
 biased by the number of the nodes (N) of the 
 network.
 
+Creates the top graphs of Figure S18 in the 
+Supplement.
 
 """
 

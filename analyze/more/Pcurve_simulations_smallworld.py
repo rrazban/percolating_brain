@@ -5,6 +5,8 @@ different reorganization probabilities and random
 graph constrained to atlas coordinates. Both graph 
 types are limited to distance targeted attack.
 
+Creates Figures S9 and S10 in the Supplement.
+
 """
 
 
@@ -18,7 +20,7 @@ from matplotlib.lines import Line2D
 from Pcurve_simulations import sample, get_experimental_data
 
 sys.path.append('../')
-from Pcurve import preprocess, break_apart 
+from Pcurve_Fig2 import preprocess, break_apart 
 
 sys.path.append('../../simulation/standard_graphs/')
 import saved_outputs
@@ -91,8 +93,8 @@ d_readin = {'pdot1 64': saved_outputs.watts_strog_pdot1_64, 'pdot5 64': saved_ou
 if __name__ == '__main__':
     which = 'distance'    #only works for distance because random ROI and SWN limited to distance targeted attack
 
-    atlas = 'Harvard-Oxford'
-#   atlas = 'Talairach'
+#    atlas = 'Harvard-Oxford'
+    atlas = 'Talairach'
     n, max_k = d_n_max_k[atlas]
     collection = np.arange(0, int(max_k+0.5), 0.5)
 

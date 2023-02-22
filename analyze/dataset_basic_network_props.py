@@ -4,6 +4,8 @@ number of nodes, average degree and length-
 density correlation. All three databases are
 shown in one figure.
 
+Creates Figure S20 in the Supplement.
+
 """
 
 import numpy as np

@@ -5,6 +5,9 @@ categorical value for UK Biobank. Categories include:
     female vs male
     diabetes vs healthy
     bipoloar/depression vs healthy
+
+Creates Figures S11, S12 and S13 in the Supplement.
+
 """
 
 

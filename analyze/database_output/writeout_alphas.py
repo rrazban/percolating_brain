@@ -4,7 +4,15 @@ each individual. Write out alpha vales to a
 text file named by the respective database,
 UK Biobank, ABCD Study or dHCP.
 
+
+Note that this script cannot be run because 
+output files are not provided in the Github
+directory. Output files must be generated from 
+process/dmri2adjacency_matrix.py after 
+acquiring dMRI scans from respective dataset.
+
 """
+
 
 import sys
 import numpy as np
@@ -17,7 +25,7 @@ from scipy.stats import spearmanr
 from datetime import datetime 
 
 sys.path.append('../')
-from Pcurve import get_experimental_data, find_zero_index, theory, sample_equidistant
+from Pcurve_Fig2 import get_experimental_data, find_zero_index, theory, sample_equidistant
 
 
 

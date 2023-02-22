@@ -1,8 +1,11 @@
 """
 Generate the percolation probability curve based 
-on theory that assumes no secondary cluster formation
-and rescaled probability (alpha) of edge fromation 
-between giant cluster and non-giant cluster nodes 
+on Giant Cluster Self Preference theory. Assumes 
+no secondary cluster formation and rescaled 
+probability (alpha) of edge fromation between 
+giant cluster and non-giant cluster nodes.
+
+Creates Figure S19 in the Supplement.
 
 """
 
@@ -18,17 +21,17 @@ import random
 from scipy.special import lambertw
 from scipy.optimize import curve_fit
 
-#sys.path.append('../analyze')
-sys.path.append('/shared/home/rostam/percolating_brain/analyze')
-from Pcurve import get_k_and_P, sample_equidistant
+sys.path.append('../analyze')
+from Pcurve_Fig2 import get_k_and_P, sample_equidistant
 from stochastic_numerics import numerics_theory, transform_p_to_matrix, get_mean_std 
 
 
-def old_theory(ks, alpha):
-	p_soln = (1 + lambertw(-np.exp(-(ks/alpha + 1)))).real
-	p_soln[0]=0
-	return p_soln
+#set the average degree such that all simulations have P=1 at the end
+#based on the number of nodes
+d_k_alpha11 = {100: 50, 727:100}
 
+
+#Equation 2 of the main text. Corresponds to our Giant Cluster Self Preference theory
 def theory(ks, a):
     p_soln = (1 + a/(a-2) * lambertw(-(a-2)/a * np.exp(-ks/a - 1 + 2/a))).real
     p_soln[0]=0
@@ -51,8 +54,6 @@ def make_graph(rescale_p_ngc, max_k, n):
     P_one = 2* 1/n
     Gcc = [ind1, ind2]
     while avgdegree < max_k:
-#    while P_one < (n-1)/n:  #issues with rounding
-#        Gcc = list(max(nx.connected_components(G), key=len))   #slow
 
         ind1 = random.choice(Gcc)	#one node must always be a part of the giant cluster
         ind2 = random.choice(all_nodes)
@@ -74,7 +75,7 @@ def make_graph(rescale_p_ngc, max_k, n):
                 ks.append(avgdegree)
                 Ps.append(P_one)
 
-    print(avgdegree, P_one)
+#    print(avgdegree, P_one)
     return G, np.array(ks), np.array(Ps)
 
 
@@ -102,7 +103,7 @@ def plotout(collection, output, pred_output, alpha, which):
     labels = add_label(alpha, which)    #set legend labels
     plt.legend(*zip(*labels), loc='lower right', prop={'size': 12})
     plt.xlim([-1, max(collection)+1])
-    plt.ylim([-0.05, 1.05])
+    #plt.ylim([-0.05, 1.05])
     plt.ylabel('probability in the giant cluster $P$', fontsize = 14 )
     plt.xlabel('average degree $\langle k \\rangle$', fontsize = 14 )
     plt.xticks(fontsize=14)
@@ -114,8 +115,6 @@ def plotout(collection, output, pred_output, alpha, which):
     plt.tight_layout()
     plt.show()
 
-#    plt.savefig('{0}_long.png'.format(which))  #for saving figure directly  #make sure X11 is opened, need to be actively on computer node for sucessful save
- #   plt.close() 
 
 def no_stochasticity_numerics_theory(N_edges, a, n):
     Ps = []
@@ -138,13 +137,18 @@ def no_stochasticity_numerics_theory(N_edges, a, n):
 
 
 if __name__ == '__main__':
-    repeat = 10#00
-
-    n = 100 
-    max_k = 50  #maximum average degree of graph
+    repeat = 5#00
+    
+    n = 727 
     alpha = 11
+    max_k = d_k_alpha11[n] 
 
-    collection = np.arange(0, 20, 0.5)
+    if n==727:
+        collection = np.arange(0, 30, 0.5)
+    else:
+        collection = np.arange(0, 20, 0.5)
+
+
     output = [[] for _ in collection]
 
     check_alpha_dist = False#True

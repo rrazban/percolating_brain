@@ -15,7 +15,7 @@ import random
 from random_graph import plotout, d_n_max_k
 
 sys.path.append('../../analyze')
-from Pcurve import get_k_and_P
+from Pcurve_Fig2 import get_k_and_P
 
 
 

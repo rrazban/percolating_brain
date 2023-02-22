@@ -3,6 +3,9 @@ Plot distribution of cluster sizes for
 for increating targeted attack at 
 various average degrees. 
 
+Creates right graph of Figure S4 in the 
+Supplement.
+
 """
 
 import os, sys
@@ -12,7 +15,7 @@ import pandas as pd
 import numpy as np
 
 sys.path.append('../')
-from Pcurve import preprocess, get_k_and_P 
+from Pcurve_Fig2 import preprocess, get_k_and_P 
 
 
 
@@ -26,7 +29,7 @@ def plot_graph(structure, thresholds, which):
     indi = 0
     for lim in thresholds:
         structure[structure<=lim] = 0	
-        G = nx.from_numpy_matrix(structure)
+        G = nx.from_numpy_array(structure)
 
         avg_degree, P_one = get_k_and_P(G)
 

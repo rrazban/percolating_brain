@@ -5,6 +5,8 @@ path length for our theory and compare to
 random graph results with the same number
 of nodes and average degree.
 
+Creates Figure S16 in the Supplement.
+
 """
 
 
@@ -18,9 +20,8 @@ import seaborn as sns
 
 from theory import make_graph
 
-#sys.path.append('../analyze')
-sys.path.append('/shared/home/rostam/percolating_brain/analyze')
-from Pcurve import get_k_and_P, sample_equidistant
+sys.path.append('../analyze')
+from Pcurve_Fig2 import get_k_and_P, sample_equidistant
 
 
 def brain_like_network(repeat, max_k, alpha, n):
@@ -38,6 +39,8 @@ def brain_like_network(repeat, max_k, alpha, n):
             pass#if P_one not equal to 1 then error raised for calculating path lenghts
     return clus_coeffs, path_lengths
 
+
+#get random graph properties with same number of nodes and average degree to accurately compare
 def random_graph(repeat, max_k, n):
     p = max_k/n
     
@@ -70,7 +73,7 @@ def setup_dataframe(cc, pl, rg_cc, rg_pl, alpha):
 
 def plotout(df_output):
     sns.set(font_scale=1.25)
-    sns.boxplot(x="property", y="value", hue="graph", data=df_output)  #very little variability
+    sns.violinplot(x="property", y="value", hue="graph", data=df_output)
     plt.legend()
     plt.xlabel('')
     plt.ylabel('')
@@ -81,8 +84,8 @@ def plotout(df_output):
 if __name__ == '__main__':
     repeat = 10#00
 
-    n = 100
-    max_k = 50  #maximum average degree of graph   
+    n = 727 
+    max_k = 100  #maximum average degree of graph   
     alpha = 11 
 
     clus_coeffs, path_lengths = brain_like_network(repeat, max_k, alpha, n)

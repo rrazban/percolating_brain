@@ -3,6 +3,8 @@ Compare percolation probability curve with numerical
 results from simulations of standard graphs: random 
 graph and scale-free graph.
 
+Creates Figures S5 and S6 in the Supplement.
+
 """
 
 
@@ -13,12 +15,10 @@ import pandas as pd
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 
-#sys.path.append('../')
-sys.path.append('/shared/home/rostam/percolating_brain/analyze')
-from Pcurve import preprocess, break_apart 
+sys.path.append('../')
+from Pcurve_Fig2 import preprocess, break_apart 
 
-#sys.path.append('../../simulation/standard_graphs/')
-sys.path.append('/shared/home/rostam/percolating_brain/simulation/standard_graphs')
+sys.path.append('../../simulation/standard_graphs/')
 import saved_outputs
 from random_graph import d_n_max_k
 

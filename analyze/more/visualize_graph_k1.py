@@ -2,6 +2,9 @@
 Visualize graph (nodes and edges) for targeted attack 
 at an average degree of 1. 
 
+Creates right graph of Figure S3 in the 
+Supplement.
+
 """
 
 import os, sys
@@ -11,7 +14,7 @@ import pandas as pd
 import numpy as np
 
 sys.path.append('../')
-from Pcurve import preprocess, get_k_and_P 
+from Pcurve_Fig2 import preprocess, get_k_and_P 
 
 
 layout = nx.spring_layout
@@ -22,13 +25,13 @@ def plot_graph(structure, thresholds, which):
     print('Number of nodes: {0}'.format(len(structure)))
     for lim in thresholds:
         structure[structure<=lim] = 0	
-        G = nx.from_numpy_matrix(structure)
+        G = nx.from_numpy_array(structure)
 
         avg_degree, P_one = get_k_and_P(G)
         if avg_degree <= 1:
             print("Average degree: {0}".format(avg_degree))
 
-            G = nx.convert_matrix.from_numpy_matrix(structure)
+            G = nx.convert_matrix.from_numpy_array(structure)
             pos = layout(G, iterations=200) #increasing iterations helps it find a better visual sometimes
             plt.title('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack", fontsize=16)  #default size is 12
 
@@ -53,7 +56,7 @@ def plot_graph(structure, thresholds, which):
 
 
 if __name__ == '__main__':
-    which = 'length'    #tract length or tract density
+    which = 'density'    #tract length or tract density
     dataset = 'ukb'    #abcd or ukb
 
     filenames = ['../../sample_outputs/atlas/HarOx_6025360_20250_2_0_{0}.txt'.format(which)]

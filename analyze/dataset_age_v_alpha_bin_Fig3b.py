@@ -4,6 +4,9 @@ for ease in visualization, however, correlations
 are calculated by considering all data points.
 All three databases are shown in one figure.
 
+Creates the bottom portion of Figure 3 in the main
+text.
+
 """
 
 import numpy as np
@@ -77,9 +80,9 @@ if __name__ == '__main__':
 
             ages.append(age)
             alphas.append(d_alpha[eid])
-            d_alpha.pop(eid, None)  #seems like we got reps in phenotypes.csv for ABCD
+            d_alpha.pop(eid, None)  #ABCD has replicates because some individuals have two scans. only consider one scan per individual
 
         plotout(ages, alphas, which, dataset,axes[shift])
-    plt.suptitle('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack", fontsize=16)  #default size is 12
+    plt.suptitle('Increasing Tract ' + r"$\bf{" + which.capitalize() + "}$" + " Targeted Attack", fontsize=16)
     plt.tight_layout()
     plt.show()

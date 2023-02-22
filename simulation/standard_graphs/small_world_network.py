@@ -16,7 +16,7 @@ import numpy as np
 from random_graph import plotout, d_n_max_k
 
 sys.path.append('../../analyze')
-from Pcurve import break_apart 
+from Pcurve_Fig2 import break_apart 
 
 pstrog = 0.5 
 
