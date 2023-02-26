@@ -68,7 +68,7 @@ def sample_equidistant(x, y):
     new_y = np.interp(t, u, y)
     return new_x, new_y
 
-#calculate the two graph properties: average degree and 
+#calculate the two graph properties: average degree and percolation probability 
 def get_k_and_P(G):
     degree = [val for (node, val) in G.degree()]
 
@@ -139,7 +139,8 @@ def theory(ks, a):
 
 
 if __name__ == '__main__':
-    which = 'length'    #tract length or tract density
+    #manually change 'which' to choose which property to target
+    which = 'length'    #tract length, tract density, or tract distance. 
 
     filename = '../sample_outputs/standard/6025360_20250_2_0_{0}.txt'.format(which) #this subject is from the ukb dataset #all subjects in sample_output/ are from ukb
 

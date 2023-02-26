@@ -1,5 +1,5 @@
 """
-Plot histograms of basic newtork properties, 
+Plot histograms of basic network properties, 
 number of nodes, average degree and length-
 density correlation. All three databases are
 shown in one figure.

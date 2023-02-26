@@ -36,6 +36,7 @@ def plotout(xs, ys, which, dataset, thresh):
 if __name__ == '__main__':
     which = 'length'    #length or density
 
+    #thresholds determined by looking at kf distribution displayed by dataset_basic_network_props.py (Fig S20)
     for thresh in [(25, 27), (27,29), (29,31)]: 
         dataset='ukb'   #only implemented for UK Biobank, so far
 

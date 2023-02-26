@@ -18,6 +18,7 @@ from check_kf_age_v_alpha import plotout
 if __name__ == '__main__':
     which = 'density'    #length or density
 
+    #thresholds determined by looking at N distribution displayed by dataset_basic_network_props.py (Fig S20)
     for thresh in [724, 727, 730]:
         dataset='ukb'
 

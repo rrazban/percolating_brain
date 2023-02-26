@@ -2,6 +2,11 @@
 Parse raw UK Biobank phenotype file and write out 
 into a more easily readable file.
 
+Note that this script cannot be reproduced in this
+GitHub directory because the raw UKB phenotype 
+file is too large for GitHub. Please acquire raw 
+phenotype file from UKB.
+
 """
 
 
@@ -11,7 +16,7 @@ import pandas as pd
 
 
 def parse_raw_phenotype_file():
-    pheno_file = 'too_big_ukb25909.csv'
+    pheno_file = 'too_big_ukb25909.csv' #takes up too much memory to put on GitHub
 
     eids = []
     ages = []
